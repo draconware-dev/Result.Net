@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netstandard2.1</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<Platforms>AnyCPU</Platforms>
+	<Title>Result.Net</Title>
+	<Authors>dragon-cs</Authors>
+	<Company>draconware</Company>
+	<Description>
+	 A lightweight, highly performant and very versatile Result&lt;T, E&gt; type implementation in C# and .Net
+	</Description>
+	<RepositoryUrl>https://github.com/draconware-dev/Result.Net</RepositoryUrl>
+	<Copyright>Copyright (c) 2024 draconware-dev</Copyright>
+	 <PackageTags>Result;Performance;Functional;Light-weight</PackageTags>
+	<PackageReleaseNotes>Version 1.0.0</PackageReleaseNotes>
+	<PackageLicenseFile>../LICENSE</PackageLicenseFile>
+	<Version>1.0.0</Version>
+	<PackageId>Draconware.Result</PackageId>
+	<PackageReadmeFile>../README.md</PackageReadmeFile>
+	<PackageIcon>../icon.png</PackageIcon>
+  </PropertyGroup>
+
+</Project>
