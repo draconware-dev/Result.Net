@@ -7,14 +7,12 @@ using System.Runtime.InteropServices;
 namespace Draconware.Result
 {
     /// <summary>
-    /// A light-weight result implementation that either contains a <see cref="Value"/> of type <typeparamref name="T"/> upon successful completion or a <see cref="Error"/> of type <typeparamref name="E"/> upon Failure. 
+    /// A lightweight result implementation that either contains a <see cref="Value"/> of type <typeparamref name="T"/> upon successful completion or a <see cref="Error"/> of type <typeparamref name="E"/> upon Failure.
     /// </summary>
     /// <typeparam name="T">The type of the potential value contained on success.</typeparam>
     /// <typeparam name="E">The type of the potential error contained on failure.</typeparam>
     [StructLayout(LayoutKind.Explicit)]
     public readonly struct Result<T, E> : IEquatable<Result<T, E>>
-        where T : notnull
-        where E : notnull
     {
         [FieldOffset(1)]
         readonly T value;
@@ -31,7 +29,7 @@ namespace Draconware.Result
         /// <param name="value">The value encapsulated by this instance of <see cref="Result{T, E}"/></param>
         /// <remarks>In practive using this constructor should never be required since there exists an implicit conversion from <typeparamref name="T"/> to <see cref="Result{T, E}"/>.
         /// In the case of ambiguity as to which overload to choose from <see cref="Result{T, E}(T)"/> and <see cref="Result{T, E}(E)"/>, <see cref="Result{T, E}.Success(T)"/> may be used instead.
-        /// Here is an example of what that might look like: 
+        /// Here is an example of what that might look like:
         /// <code>
         /// using static Result&lt;ConcreteT&#44; ConcreteE&gt;;
         /// 
@@ -39,9 +37,9 @@ namespace Draconware.Result
         /// 
         /// Result&lt;ConcreteT&#44; ConcreteE&gt; Sample(TConcrete value)
         /// {
-        ///     return Success(value);  
+        ///     return Success(value);
         /// }
-        /// </code>  
+        /// </code>
         /// </remarks>
         public Result(T value)
         {
@@ -65,13 +63,13 @@ namespace Draconware.Result
         /// <code>
         /// using static Result&lt;ConcreteT&#44; ConcreteE&gt;;
         /// 
-        /// [...] 
+        /// [...]
         /// 
         /// Result&lt;ConcreteT&#44; ConcreteE&gt; Sample(ConcreteE error)
         /// {
-        ///     return Failure(value);  
+        ///     return Failure(value);
         /// }
-        /// </code>  
+        /// </code>
         /// </remarks>
         public Result(E error)
         {
@@ -90,9 +88,9 @@ namespace Draconware.Result
         /// The Value contained in this struct upon success.
         /// </summary>
         /// <remarks>Please notice that either <see cref="IsSuccess"/> or <c>!</c><see cref="IsFailure"/> must be checked before access.
-        /// Despite the implied return type nullability of this property, checking for <c>not null</c> is insufficient for determining the validity of the value as we're working with uninitialized memory. 
-        /// Access of this property without previous checks on either <see cref="IsSuccess"/> or <c>!</c><see cref="IsFailure"/> is UNDEFINED BEHAVIOUR. 
-        /// </remarks> 
+        /// Despite the implied return type nullability of this property, checking for <c>not null</c> is insufficient for determining the validity of the value as we're working with uninitialized memory.
+        /// Access of this property without previous checks on either <see cref="IsSuccess"/> or <c>!</c><see cref="IsFailure"/> is UNDEFINED BEHAVIOUR.
+        /// </remarks>
         public readonly T? Value => value;
 
         /// <summary>
@@ -178,7 +176,7 @@ namespace Draconware.Result
         /// <returns><see langword="true"/> if they are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(Result<T, E> left, Result<T, E> right)
         {
-            return left.IsSuccess && right.IsSuccess && left.Value.Equals(right.Value);
+            return left.IsSuccess && right.IsSuccess && left.Value!.Equals(right.Value);
         }
 
         /// <summary>
@@ -191,6 +189,7 @@ namespace Draconware.Result
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
         public static implicit operator Result<T, E>(T value)
 
         {
@@ -201,6 +200,7 @@ namespace Draconware.Result
         {
             return new Result<T, E>(error);
         }
+
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
@@ -232,6 +232,11 @@ namespace Draconware.Result
             return HashCode.Combine(IsSuccess, value);
         }
 
+        /// <summary>
+        /// Conditionally executes an Action based on whether or not <see cref="IsSuccess"/> is <see langword="true"/>.
+        /// </summary>
+        /// <param name="onSuccess">The <see cref="Action{T}"/> executed when <see cref="IsSuccess"/> is <see langword="true"/>.</param>
+        /// <param name="onError">The <see cref="Action{E}"/> executed when <see cref="IsSuccess"/> is <see langword="false"/>.</param>
         public readonly void Match(Action<T> onSuccess, Action<E> onError)
         {
             if (IsSuccess)
@@ -243,6 +248,14 @@ namespace Draconware.Result
             onError(Error);
         }
 
+
+        /// <summary>
+        /// Conditionally executes a Func based on whether or not <see cref="IsSuccess"/> is <see langword="true"/> and returns the value it returns.
+        /// </summary>
+        /// <typeparam name="TResult">The Type of the value to return and transform <typeparamref name="T"/> or <typeparamref name="E"/> into.</typeparam>
+        /// <param name="onSuccess">The <see cref="Func{T, TResult}"/> executed when <see cref="IsSuccess"/> is <see langword="true"/>.</param>
+        /// <param name="onError">The <see cref="Func{E, TResult}"/> executed when <see cref="IsSuccess"/> is <see langword="false"/>.</param>
+        /// <returns>The value returned by either <paramref name="onSuccess"/> or <paramref name="onError"/>.</returns>
         public readonly TResult Match<TResult>(Func<T, TResult> onSuccess, Func<E, TResult> onError)
         {
             if (IsSuccess)
@@ -253,6 +266,11 @@ namespace Draconware.Result
             return onError(Error);
         }
 
+        /// <summary>
+        /// Maps this result from a <see cref="Result{T, E}"/> to <see cref="Result{U, E}"/>.
+        /// </summary>
+        /// <typeparam name="U">The type to transform <typeparamref name="T"/> into.</typeparam>
+        /// <param name="map">Maps <typeparamref name="T"/> to <typeparamref name="U"/>.</param>
         public readonly Result<U, E> Map<U>(Func<T, U> map)
         {
             if (IsFailure)
@@ -263,6 +281,11 @@ namespace Draconware.Result
             return map(value);
         }
 
+        /// <summary>
+        /// Maps this result from a <see cref="Result{T, E}"/> to <see cref="Result{U, E}"/>.
+        /// </summary>
+        /// <typeparam name="U">The type to transform <typeparamref name="E"/> into.</typeparam>
+        /// <param name="map">Maps <typeparamref name="E"/> to <typeparamref name="U"/>.</param>
         public readonly Result<T, U> MapError<U>(Func<E, U> map)
         {
             if (IsSuccess)
@@ -332,11 +355,21 @@ namespace Draconware.Result
             return false;
         }
 
+        /// <summary>
+        /// Explicitly creates a successful <see cref="Result{T, E}"/>.
+        /// </summary>
+        /// <param name="value">The value to be encapsulated by this <see cref="Result{T, E}"/>.</param>
+        /// <returns>A <see cref="Result{T, E}"/> containing <paramref name="value"/>.</returns>
         public static Result<T, E> Success(T value)
         {
             return new Result<T, E>(value);
         }
 
+        /// <summary>
+        /// Explicitly creates a failed <see cref="Result{T, E}"/>.
+        /// </summary>
+        /// <param name="error">The error to be encapsulated by this <see cref="Result{T, E}"/>.</param>
+        /// <returns>A <see cref="Result{T, E}"/> containing <paramref name="error"/>.</returns>
         public static Result<T, E> Failure(E error)
         {
             return new Result<T, E>(error);

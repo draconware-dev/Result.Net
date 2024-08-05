@@ -14,7 +14,7 @@
 	</Description>
 	<RepositoryUrl>https://github.com/draconware-dev/Result.Net</RepositoryUrl>
 	<Copyright>Copyright (c) 2024 draconware-dev</Copyright>
-	 <PackageTags>Result;Performance;Functional;Light-weight</PackageTags>
+	 <PackageTags>Result;Performance;Functional;Lightweight</PackageTags>
 	<PackageReleaseNotes>Version 1.0.0</PackageReleaseNotes>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	<Version>1.0.0</Version>

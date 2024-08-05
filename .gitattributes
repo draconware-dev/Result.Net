@@ -1,3 +1,9 @@
 * text=auto
-*.sln   text eol=crlf
-*.png   binary
+*.sln            text eol=crlf
+*.png            binary
+LICENSE          text
+*.md             text diff=markdown
+*.cs             text diff=csharp
+.gitattributes   text
+.gitignore       text
+*.csproj         text eol=crlf
