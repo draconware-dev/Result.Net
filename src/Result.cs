@@ -252,6 +252,27 @@ namespace Draconware.Result
 
             return onError(Error);
         }
+
+        public readonly Result<U, E> Map<U>(Func<T, U> map)
+        {
+            if (IsFailure)
+            {
+                return error;
+            }
+
+            return map(value);
+        }
+
+        public readonly Result<T, U> MapError<U>(Func<E, U> map)
+        {
+            if (IsSuccess)
+            {
+                return value;
+            }
+
+            return map(error);
+        }
+
         /// <summary>
         /// Returns a string that represents the current object.
         /// </summary>
